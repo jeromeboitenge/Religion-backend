@@ -100,7 +100,6 @@ model Church {
   contactPhone      String?
   contactEmail      String?
   website           String?
-  website           String?
   serviceTimes      Json?              // Changed to Json for structured data
   logoUrl           String?
   verificationStatus VerificationStatus @default(DRAFT)
