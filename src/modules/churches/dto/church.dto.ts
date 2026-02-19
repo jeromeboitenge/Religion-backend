@@ -7,6 +7,10 @@ export class CreateChurchDto {
 
     @IsString()
     @IsNotEmpty()
+    organizationId: string;
+
+    @IsString()
+    @IsNotEmpty()
     district: string;
 
     @IsString()
@@ -29,9 +33,8 @@ export class CreateChurchDto {
     @IsOptional()
     description?: string;
 
-    @IsString()
     @IsOptional()
-    serviceTimes?: string;
+    serviceTimes?: any;
 
     @IsString()
     @IsOptional()
@@ -67,9 +70,8 @@ export class UpdateChurchDto {
     @IsOptional()
     description?: string;
 
-    @IsString()
     @IsOptional()
-    serviceTimes?: string;
+    serviceTimes?: any;
 
     @IsString()
     @IsOptional()
