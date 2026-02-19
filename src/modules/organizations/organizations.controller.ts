@@ -30,8 +30,8 @@ export class OrganizationController {
     @Patch(':id')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.SUPER_ADMIN)
-    update(@Param('id') id: string, @Body() updateOrganizationDto: UpdateOrganizationDto) {
-        return this.organizationService.update(id, updateOrganizationDto);
+    update(@Param('id') id: string, @Body() updateOrganizationDto: UpdateOrganizationDto, @Request() req: any) {
+        return this.organizationService.update(id, updateOrganizationDto, req.user.userId);
     }
 
     @Delete(':id')

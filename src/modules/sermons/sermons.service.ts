@@ -71,4 +71,11 @@ export class SermonsService {
             where: { id },
         });
     }
+
+    async incrementViewCount(id: string): Promise<Sermon> {
+        return this.prisma.sermon.update({
+            where: { id },
+            data: { viewCount: { increment: 1 } },
+        });
+    }
 }

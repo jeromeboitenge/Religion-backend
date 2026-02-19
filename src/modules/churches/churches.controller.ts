@@ -46,7 +46,13 @@ export class ChurchesController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.SUPER_ADMIN)
     @Post(':id/verify')
-    async verify(@Param('id') id: string, @Body('status') status: VerificationStatus) {
-        return this.churchesService.verify(id, status);
+    async verify(@Param('id') id: string, @Body('status') status: VerificationStatus, @Request() req: any) {
+        return this.churchesService.verify(id, status, req.user.userId);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post(':id/follow')
+    async toggleFollow(@Param('id') id: string, @Request() req: any) {
+        return this.churchesService.toggleFollow(req.user.userId, id);
     }
 }

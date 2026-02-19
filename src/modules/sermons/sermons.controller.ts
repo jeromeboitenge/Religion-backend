@@ -57,4 +57,9 @@ export class SermonsController {
         }
         return this.sermonsService.remove(id);
     }
+
+    @Patch(':id/views')
+    async incrementViewCount(@Param('id') id: string) {
+        return this.sermonsService.incrementViewCount(id);
+    }
 }

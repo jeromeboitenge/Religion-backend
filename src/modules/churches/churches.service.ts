@@ -1,11 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { VerificationStatus, Prisma, Church } from '@prisma/client';
+import { AuditService } from '../audit/audit.service';
+import { VerificationStatus, Prisma, Church, OrganizationStatus } from '@prisma/client';
 import { CreateChurchDto, UpdateChurchDto } from './dto/church.dto';
 
 @Injectable()
 export class ChurchesService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private audit: AuditService
+    ) { }
 
     async create(data: CreateChurchDto, userId: string): Promise<Church> {
         return this.prisma.church.create({
@@ -64,12 +68,36 @@ export class ChurchesService {
         });
     }
 
-    async verify(id: string, status: VerificationStatus): Promise<Church> {
-        await this.findOne(id);
-        return this.prisma.church.update({
+    async verify(id: string, status: VerificationStatus, moderatorId: string): Promise<Church> {
+        const church = await this.prisma.church.findUnique({
+            where: { id },
+            include: { organization: true }
+        });
+
+        if (!church) {
+            throw new NotFoundException(`Church with ID ${id} not found`);
+        }
+
+        // Hierarchy Rule: Denomination must be active for church to be verified
+        if (status === VerificationStatus.VERIFIED && church.organization.status === OrganizationStatus.INACTIVE) {
+            throw new Error('Cannot verify church: Parent Organization is INACTIVE');
+        }
+
+        const updated = await this.prisma.church.update({
             where: { id },
             data: { verificationStatus: status },
         });
+
+        // Log security action
+        await this.audit.log(
+            `VERIFY_CHURCH_${status}`,
+            moderatorId,
+            'CHURCH',
+            id,
+            { oldStatus: church.verificationStatus, newStatus: status }
+        );
+
+        return updated;
     }
 
     async isChurchAdmin(userId: string, churchId: string): Promise<boolean> {
@@ -82,5 +110,27 @@ export class ChurchesService {
             }
         });
         return !!church;
+    }
+
+    async toggleFollow(userId: string, churchId: string) {
+        const existing = await this.prisma.followChurch.findUnique({
+            where: {
+                userId_churchId: { userId, churchId }
+            }
+        });
+
+        if (existing) {
+            await this.prisma.followChurch.delete({
+                where: {
+                    userId_churchId: { userId, churchId }
+                }
+            });
+            return { followed: false };
+        }
+
+        await this.prisma.followChurch.create({
+            data: { userId, churchId }
+        });
+        return { followed: true };
     }
 }
