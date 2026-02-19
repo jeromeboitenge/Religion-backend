@@ -258,6 +258,7 @@ model Course {
   
   lessons          Lesson[]
   enrollments      Enrollment[]
+  certificates     Certificate[]
 }
 
 model Lesson {
@@ -323,7 +324,7 @@ model Certificate {
   userId       String
   user         User     @relation(fields: [userId], references: [id])
   courseId     String
-  // Relation to Course might be useful too
+  course       Course   @relation(fields: [courseId], references: [id])
   
   @@unique([userId, courseId]) // One cert per course per user
 }
