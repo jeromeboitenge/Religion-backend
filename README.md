@@ -1,98 +1,149 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Urumuri — Rwanda Christian Digital Ecosystem
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A production-ready, Rwanda-focused Christian platform supporting multiple denominations. Built with NestJS, Prisma and PostgreSQL.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
+## 🚀 Quick Start (One Command)
 
 ```bash
-$ npm install
+# 1. Clone & enter project
+cd backend
+
+# 2. Copy environment variables
+cp .env.example .env
+
+# 3. Start PostgreSQL via Docker
+docker-compose up -d
+
+# 4. Install dependencies
+npm install
+
+# 5. Run migrations & seed
+npx prisma migrate dev
+npm run seed
+
+# 6. Start the server
+npm run start:dev
 ```
 
-## Compile and run the project
+The API will be available at **http://localhost:3000/api/v1** and Swagger docs at **http://localhost:3000/api/docs**.
+
+---
+
+## 📐 Architecture
+
+```
+Organization (Denomination)
+  └── Church (Parish/Branch)
+        ├── Sermons
+        ├── Events
+        └── Announcements
+
+Users Roles: USER | CHURCH_ADMIN | TEACHER | MODERATOR | SUPER_ADMIN
+```
+
+## 📦 Tech Stack
+
+| Layer       | Technology                |
+|-------------|---------------------------|
+| Framework   | NestJS (modular)          |
+| ORM         | Prisma v5                 |
+| Database    | PostgreSQL 15             |
+| Auth        | JWT (access tokens)       |
+| Validation  | class-validator           |
+| API Docs    | Swagger / OpenAPI         |
+| Infra       | Docker Compose            |
+
+## 🗂 Module Structure
+
+```
+src/modules/
+├── auth/           — JWT login, register, RBAC guards
+├── users/          — user profile management
+├── organizations/  — Christian org directory (Super Admin)
+├── churches/       — church CRUD & verification
+├── sermons/        — sermon content management
+├── events/         — church events
+├── announcements/  — church announcements
+├── devotions/      — daily devotions with scheduling
+├── academy/        — Bible courses, lessons, quizzes, enrollment
+├── community/      — posts, comments, reactions
+├── moderation/     — reports & moderation actions
+├── notifications/  — in-app notifications
+├── audit/          — audit logs (global service)
+└── prisma/         — Prisma client (global service)
+```
+
+## 🔑 Default Seed Credentials
+
+| Role         | Email                    | Password     |
+|--------------|--------------------------|--------------|
+| SUPER_ADMIN  | superadmin@urumuri.rw    | password123  |
+| CHURCH_ADMIN | admin1@church.rw         | password123  |
+| CHURCH_ADMIN | admin2@church.rw         | password123  |
+| TEACHER      | teacher@academy.rw       | password123  |
+| USER         | user1@urumuri.rw         | password123  |
+
+> ⚠️ Change all passwords before deploying to production.
+
+## 🗄 Database
 
 ```bash
-# development
-$ npm run start
+# Open Prisma Studio (visual DB browser)
+npx prisma studio
 
-# watch mode
-$ npm run start:dev
+# Create a new migration after schema changes
+npx prisma migrate dev --name your_migration_name
 
-# production mode
-$ npm run start:prod
+# Reset database and re-seed
+npx prisma migrate reset
+npm run seed
 ```
 
-## Run tests
+## 🧪 Testing
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run test           # unit tests
+npm run test:cov       # coverage report
+npm run test:e2e       # end-to-end tests
 ```
 
-## Deployment
+## 📖 API Documentation
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Swagger UI: [http://localhost:3000/api/docs](http://localhost:3000/api/docs)
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+All protected endpoints require a Bearer JWT token. Use the `/api/v1/auth/login` endpoint to obtain a token.
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+## 🔐 Authentication Flow
+
+```
+POST /api/v1/auth/register  — create account
+POST /api/v1/auth/login     — get JWT token
+GET  /api/v1/auth/profile   — view own profile (requires auth)
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## 🏗 Key API Endpoints
 
-## Resources
+| Resource          | Base Route                       |
+|-------------------|----------------------------------|
+| Organizations     | /api/v1/organizations            |
+| Churches          | /api/v1/churches                 |
+| Sermons           | /api/v1/sermons                  |
+| Events            | /api/v1/events                   |
+| Announcements     | /api/v1/announcements            |
+| Devotions         | /api/v1/devotions                |
+| Academy Courses   | /api/v1/academy/courses          |
+| Community Posts   | /api/v1/community/posts          |
+| Reports           | /api/v1/moderation/report        |
+| Notifications     | /api/v1/notifications            |
 
-Check out a few resources that may come in handy when working with NestJS:
+## 🌍 Environment Variables
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+See [`.env.example`](.env.example) for all configuration options.
 
-## Support
+## 📋 Assumptions & Decisions
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- Media uploads use **external URLs** (YouTube, SoundCloud, etc.) — no file upload server required for MVP.
+- Certificates have a unique `certificateCode` (UUID) for QR verification — PDF generation is a stub (URL-based).
+- `serviceTimes` stored as **JSON** (e.g. `{"sunday": "9:00 AM", "wednesday": "6:00 PM"}`).
+- Rate limiting and email service are **stubbed** — structure is ready for production wiring.
+- Languages: `EN` (English) and `RW` (Kinyarwanda) supported per content item.
