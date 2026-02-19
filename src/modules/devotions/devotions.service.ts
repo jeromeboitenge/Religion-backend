@@ -17,17 +17,24 @@ export class DevotionsService {
         });
     }
 
-    async findAll(query?: { language?: string; month?: string; year?: string }): Promise<Devotion[]> {
+    async findAll(query?: { language?: string; month?: string; year?: string; take?: number }): Promise<Devotion[]> {
         const where: Prisma.DevotionWhereInput = {
             status: PublishStatus.PUBLISHED,
-            date: { lte: new Date() }, // Don't show future ones unless specific permission (handled in controller maybe)
+            date: { lte: new Date() },
         };
-        // Implement month/year filtering if needed
 
         return this.prisma.devotion.findMany({
             where,
             orderBy: { date: 'desc' },
-            take: 30, // Pagination needed later
+            take: query?.take || 30,
+        });
+    }
+
+    async findLatest(take: number = 7): Promise<Devotion[]> {
+        return this.prisma.devotion.findMany({
+            where: { status: PublishStatus.PUBLISHED, date: { lte: new Date() } },
+            orderBy: { date: 'desc' },
+            take,
         });
     }
 

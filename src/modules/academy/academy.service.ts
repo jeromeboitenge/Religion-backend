@@ -234,6 +234,17 @@ export class AcademyService {
             });
         }
 
-        return { enrollment: updatedEnrollment, certificate };
+        async verifyCertificate(code: string): Promise < any > {
+            const certificate = await this.prisma.certificate.findUnique({
+                where: { certificateCode: code },
+                include: {
+                    user: { select: { displayName: true } },
+                    course: { select: { title: true } }
+                }
+            });
+            if(!certificate) {
+                throw new NotFoundException(`Certificate with code ${code} not found`);
+            }
+        return certificate;
+        }
     }
-}

@@ -15,6 +15,11 @@ export class DevotionsController {
         return this.devotionsService.findToday();
     }
 
+    @Get('latest')
+    async findLatest(@Query('take') take?: string) {
+        return this.devotionsService.findLatest(take ? parseInt(take) : 7);
+    }
+
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.SUPER_ADMIN, Role.TEACHER, Role.MODERATOR)
     @Post()

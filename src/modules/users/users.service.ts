@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { User, Prisma } from '@prisma/client';
+import { User, Prisma, Role, UserStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -38,7 +38,7 @@ export class UsersService {
         });
     }
 
-    async findAll(query?: { role?: Role; status?: UserStatus }): Promise<User[]> {
+    async findAll(query?: { role?: Role; status?: UserStatus }): Promise<any[]> {
         const where: Prisma.UserWhereInput = {};
         if (query?.role) where.role = query.role;
         if (query?.status) where.status = query.status;
