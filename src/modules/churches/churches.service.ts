@@ -18,13 +18,16 @@ export class ChurchesService {
         });
     }
 
-    async findAll(query?: { district?: string; verified?: boolean }): Promise<Church[]> {
+    async findAll(query?: { district?: string; verified?: boolean; organizationId?: string }): Promise<Church[]> {
         const where: Prisma.ChurchWhereInput = {};
         if (query?.district) {
             where.district = { contains: query.district, mode: 'insensitive' };
         }
         if (query?.verified !== undefined) {
             where.verificationStatus = query.verified ? VerificationStatus.VERIFIED : undefined;
+        }
+        if (query?.organizationId) {
+            where.organizationId = query.organizationId;
         }
 
         return this.prisma.church.findMany({

@@ -12,17 +12,15 @@ export class ChurchesController {
 
     @UseGuards(JwtAuthGuard)
     @Post()
-    async create(@Body() createChurchDto: CreateChurchDto, @Request() req) {
-        // Ideally user is verified or something, but for MVP any user can create a church draft
+    async create(@Body() createChurchDto: CreateChurchDto, @Request() req: any) {
         return this.churchesService.create(createChurchDto, req.user.userId);
     }
 
     @Get()
-    async findAll(@Query('district') district?: string) {
-        return this.churchesService.findAll({ district, verified: true });
+    async findAll(@Query('district') district?: string, @Query('organizationId') organizationId?: string) {
+        return this.churchesService.findAll({ district, verified: true, organizationId });
     }
 
-    // Admin access to all
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.SUPER_ADMIN, Role.MODERATOR)
     @Get('admin/all')
@@ -37,7 +35,7 @@ export class ChurchesController {
 
     @UseGuards(JwtAuthGuard)
     @Patch(':id')
-    async update(@Param('id') id: string, @Body() updateChurchDto: UpdateChurchDto, @Request() req) {
+    async update(@Param('id') id: string, @Body() updateChurchDto: UpdateChurchDto, @Request() req: any) {
         const isOwner = await this.churchesService.isChurchAdmin(req.user.userId, id);
         if (!isOwner && req.user.role !== Role.SUPER_ADMIN) {
             throw new ForbiddenException('You do not have permission to update this church');
