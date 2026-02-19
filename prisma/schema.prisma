@@ -7,6 +7,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Organization & Church Hierarchy
+enum OrganizationStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Organization {
+  id          String             @id @default(uuid())
+  name        String             @unique
+  description String?
+  logoUrl     String?
+  status      OrganizationStatus @default(ACTIVE)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  churches    Church[]
+}
+
 // User & Auth
 enum Role {
   USER
@@ -82,12 +100,16 @@ model Church {
   contactPhone      String?
   contactEmail      String?
   website           String?
-  serviceTimes      String?            // JSON string or simple text describing times
+  website           String?
+  serviceTimes      Json?              // Changed to Json for structured data
   logoUrl           String?
   verificationStatus VerificationStatus @default(DRAFT)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   
+  organizationId    String
+  organization      Organization       @relation(fields: [organizationId], references: [id])
+
   admins            User[]             @relation("ChurchAdmins")
   sermons           Sermon[]
   events            Event[]
@@ -296,6 +318,7 @@ model LessonProgress {
 model Certificate {
   id           String   @id @default(uuid())
   issuedAt     DateTime @default(now())
+  certificateCode String @unique @default(uuid()) // Unique code for verification
   certificateUrl String? // Link to generated PDF or verification page
   
   userId       String
@@ -425,4 +448,14 @@ model Notification {
   type      String   // "DEVOTION", "FOLLOW", "CERTIFICATE", "SYSTEM"
   data      Json?    // Extra payload
   createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  action      String
+  performedBy String?  // User ID or System
+  targetType  String?
+  targetId    String?
+  details     Json?
+  createdAt   DateTime @default(now())
 }

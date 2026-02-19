@@ -11,9 +11,10 @@ import { AnnouncementsModule } from './modules/announcements/announcements.modul
 import { DevotionsModule } from './modules/devotions/devotions.module';
 import { AcademyModule } from './modules/academy/academy.module';
 import { CommunityModule } from './modules/community/community.module';
+import { ModerationModule } from './modules/moderation/moderation.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, ChurchesModule, SermonsModule, EventsModule, AnnouncementsModule, DevotionsModule, AcademyModule, CommunityModule],
+  imports: [PrismaModule, AuthModule, UsersModule, ChurchesModule, SermonsModule, EventsModule, AnnouncementsModule, DevotionsModule, AcademyModule, CommunityModule, ModerationModule],
   controllers: [AppController],
   providers: [AppService],
 })
