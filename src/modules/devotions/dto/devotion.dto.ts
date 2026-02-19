@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsDateString, IsBooleany, IsArray, IsBoolean } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum, IsDateString, IsArray, IsBoolean } from 'class-validator';
 import { PublishStatus, Language } from '@prisma/client';
 
 export class CreateDevotionDto {

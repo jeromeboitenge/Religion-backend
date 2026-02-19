@@ -8,9 +8,11 @@ import { ChurchesModule } from './modules/churches/churches.module';
 import { SermonsModule } from './modules/sermons/sermons.module';
 import { EventsModule } from './modules/events/events.module';
 import { AnnouncementsModule } from './modules/announcements/announcements.module';
+import { DevotionsModule } from './modules/devotions/devotions.module';
+import { AcademyModule } from './modules/academy/academy.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, ChurchesModule, SermonsModule, EventsModule, AnnouncementsModule],
+  imports: [PrismaModule, AuthModule, UsersModule, ChurchesModule, SermonsModule, EventsModule, AnnouncementsModule, DevotionsModule, AcademyModule],
   controllers: [AppController],
   providers: [AppService],
 })
