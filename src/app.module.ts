@@ -13,9 +13,10 @@ import { AcademyModule } from './modules/academy/academy.module';
 import { CommunityModule } from './modules/community/community.module';
 import { ModerationModule } from './modules/moderation/moderation.module';
 import { OrganizationModule } from './modules/organizations/organizations.module';
+import { NotificationModule } from './modules/notifications/notifications.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, ChurchesModule, SermonsModule, EventsModule, AnnouncementsModule, DevotionsModule, AcademyModule, CommunityModule, ModerationModule, OrganizationModule],
+  imports: [PrismaModule, AuthModule, UsersModule, ChurchesModule, SermonsModule, EventsModule, AnnouncementsModule, DevotionsModule, AcademyModule, CommunityModule, ModerationModule, OrganizationModule, NotificationModule],
   controllers: [AppController],
   providers: [AppService],
 })
