@@ -22,10 +22,7 @@ export class AuthService {
     }
 
     async login(user: any) {
-        const payload = { email: user.email, sub: user.id, role: user.role };
-        return {
-            access_token: this.jwtService.sign(payload),
-        };
+        return this.generateTokens(user);
     }
 
     async register(registerDto: RegisterDto) {
@@ -33,11 +30,24 @@ export class AuthService {
         if (existingUser) {
             throw new UnauthorizedException('User already exists');
         }
-        return this.usersService.create({
+        const user = await this.usersService.create({
             email: registerDto.email,
             password: registerDto.password,
             displayName: registerDto.displayName,
             district: registerDto.district,
         });
+
+        return {
+            user,
+            ...(await this.generateTokens(user)),
+        };
+    }
+
+    private async generateTokens(user: any) {
+        const payload = { email: user.email, sub: user.id, role: user.role };
+        return {
+            access_token: this.jwtService.sign(payload),
+            refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }), // Long lived
+        };
     }
 }

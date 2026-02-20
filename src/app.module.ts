@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
@@ -18,7 +19,10 @@ import { AuditModule } from './modules/audit/audit.module';
 import { BookmarksModule } from './modules/bookmarks/bookmarks.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, ChurchesModule, SermonsModule, EventsModule, AnnouncementsModule, DevotionsModule, AcademyModule, CommunityModule, ModerationModule, OrganizationModule, NotificationModule, AuditModule, BookmarksModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule, AuthModule, UsersModule, ChurchesModule, SermonsModule, EventsModule, AnnouncementsModule, DevotionsModule, AcademyModule, CommunityModule, ModerationModule, OrganizationModule, NotificationModule, AuditModule, BookmarksModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -157,4 +157,9 @@ export class AcademyController {
     async completeLesson(@Param('lessonId') lessonId: string, @Request() req: any) {
         return this.academyService.completeLesson(req.user.userId, lessonId);
     }
+
+    @Get('certificates/verify/:code')
+    async verifyCertificate(@Param('code') id: string) {
+        return this.academyService.verifyCertificate(id);
+    }
 }

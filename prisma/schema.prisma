@@ -14,15 +14,17 @@ enum OrganizationStatus {
 }
 
 model Organization {
-  id          String             @id @default(uuid())
-  name        String             @unique
-  description String?
-  logoUrl     String?
-  status      OrganizationStatus @default(ACTIVE)
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
+  id                        String             @id @default(uuid())
+  name                      String             @unique
+  description               String?
+  logoUrl                   String?
+  status                    OrganizationStatus @default(ACTIVE)
+  liturgicalDevotionEnabled Boolean            @default(false)
+  createdAt                 DateTime           @default(now())
+  updatedAt                 DateTime           @updatedAt
 
-  churches    Church[]
+  churches                  Church[]
+  devotions                 Devotion[]
 }
 
 // User & Auth
@@ -43,6 +45,12 @@ enum UserStatus {
 enum Language {
   EN
   RW
+  FR
+}
+
+enum DevotionSourceType {
+  AUTO_CATHOLIC
+  MANUAL
 }
 
 model User {
@@ -189,26 +197,43 @@ model Announcement {
   church       Church        @relation(fields: [churchId], references: [id])
 }
 
-// Content: Devotions
+// Content: Devotions (Multilingual + Liturgical)
 model Devotion {
-  id                  String        @id @default(uuid())
-  date                DateTime      @unique // One per day ideally
-  title               String
-  bibleReference      String
-  verseText           String
-  content             String
-  prayer              String?
-  reflectionQuestions String[]
-  language            Language      @default(EN)
-  featured            Boolean       @default(false)
-  status              PublishStatus @default(DRAFT)
-  authorId            String?       // Could be tied to a User or just text
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
-  
-  comments            Comment[]
-  reactions           Reaction[]
-  bookmarks           Bookmark[]
+  id               String             @id @default(uuid())
+  organizationId   String?
+  organization     Organization?      @relation(fields: [organizationId], references: [id])
+  date             DateTime
+  liturgicalTitle  String?
+  season           String?
+  rank             String?
+  bibleReferences  Json?              // Array of { type, reference, summary? }
+  title_en         String
+  title_rw         String?
+  title_fr         String?
+  message_en       String
+  message_rw       String?
+  message_fr       String?
+  prayer_en        String?
+  prayer_rw        String?
+  prayer_fr        String?
+  reflection_en    String?
+  reflection_rw    String?
+  reflection_fr    String?
+  action_en        String?
+  action_rw        String?
+  action_fr        String?
+  sourceType       DevotionSourceType @default(MANUAL)
+  status           PublishStatus      @default(DRAFT)
+  featured         Boolean            @default(false)
+  authorId         String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  comments         Comment[]
+  reactions        Reaction[]
+  bookmarks        Bookmark[]
+
+  @@unique([date, organizationId])
 }
 
 model Bookmark {
