@@ -78,6 +78,9 @@ export class DevotionsService {
 
     return {
       date,
+      title_en: `Daily Devotion: ${theme.en}`,
+      title_rw: `Gusenga bwa Buri Munsi: ${theme.rw}`,
+      title_fr: `Dévotion Quotidienne: ${theme.fr}`,
       theme_en: theme.en,
       theme_rw: theme.rw,
       theme_fr: theme.fr,

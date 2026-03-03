@@ -90,11 +90,11 @@ export class MessagingService {
 
     await this.prisma.auditLog.create({
       data: {
-        userId,
+        performedById: userId,
         action: 'MESSAGE_SENT',
-        entityType: 'Message',
-        entityId: message.id,
-        metadata: JSON.stringify({ threadId }),
+        targetType: 'Message',
+        targetId: message.id,
+        details: { threadId },
       },
     });
 
@@ -166,11 +166,11 @@ export class MessagingService {
 
     await this.prisma.auditLog.create({
       data: {
-        userId: senderId,
+        performedById: senderId,
         action: 'DIRECT_MESSAGE_SENT',
-        entityType: 'DirectMessage',
-        entityId: message.id,
-        metadata: JSON.stringify({ receiverId: dto.receiverId }),
+        targetType: 'DirectMessage',
+        targetId: message.id,
+        details: { receiverId: dto.receiverId },
       },
     });
 
@@ -186,8 +186,9 @@ export class MessagingService {
 
     return this.prisma.messageReport.create({
       data: {
-        messageId,
-        reportedBy,
+        reporterId: reportedBy,
+        targetType: 'MESSAGE',
+        targetId: messageId,
         reason: dto.reason,
         description: dto.description,
       },

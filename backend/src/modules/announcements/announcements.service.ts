@@ -15,8 +15,7 @@ export class AnnouncementsService {
     return this.prisma.announcement.findMany({
       where,
       include: {
-        church: { select: { name_en: true, name_rw: true, name_fr: true } },
-        group: { select: { name_en: true, name_rw: true, name_fr: true } },
+        church: { select: { name: true } },
         createdByUser: {
           select: {
             id: true,
@@ -34,7 +33,6 @@ export class AnnouncementsService {
       where: { id },
       include: {
         church: true,
-        group: true,
         createdByUser: {
           select: {
             id: true,
@@ -49,15 +47,21 @@ export class AnnouncementsService {
     return announcement;
   }
 
-  async create(dto: CreateAnnouncementDto, createdBy: string) {
+  async create(dto: CreateAnnouncementDto, userId: string) {
     return this.prisma.announcement.create({
       data: {
-        ...dto,
-        createdBy,
+        churchId: dto.churchId,
+        title_en: dto.title_en,
+        title_rw: dto.title_rw,
+        title_fr: dto.title_fr,
+        content_en: dto.content_en,
+        content_rw: dto.content_rw,
+        content_fr: dto.content_fr,
+        priority: dto.priority,
+        userId,
       },
       include: {
         church: true,
-        group: true,
       },
     });
   }

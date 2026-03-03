@@ -29,7 +29,7 @@ export class AnnouncementsController {
   @UseGuards(RolesGuard)
   @Roles('GROUP_LEADER', 'PARISH_ADMIN', 'SUPER_ADMIN')
   @ApiOperation({ summary: 'Create announcement' })
-  create(@Body() dto: CreateAnnouncementDto, @Request() req) {
+  create(@Body() dto: CreateAnnouncementDto, @Request() req: any) {
     return this.announcementsService.create(dto, req.user.userId);
   }
 }
