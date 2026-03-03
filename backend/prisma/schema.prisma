@@ -1,0 +1,563 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// URUMURI REGIO - Catholic Youth & Legion Management Platform
+// ============================================================
+
+// User & Auth
+enum Role {
+  YOUTH_USER
+  GROUP_MEMBER
+  GROUP_LEADER
+  SECRETARY
+  TREASURER
+  PARISH_ADMIN
+  COUNCIL_ADMIN
+  MODERATOR
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+enum Language {
+  EN
+  RW
+  FR
+}
+
+model User {
+  id             String         @id @default(uuid())
+  email          String         @unique
+  password       String
+  displayName    String
+  phoneNumber    String?
+  district       String?
+  sector         String?
+  language       Language       @default(EN)
+  role           Role           @default(YOUTH_USER)
+  status         UserStatus     @default(ACTIVE)
+  onboardingComplete Boolean     @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  
+  primaryChurchId String?
+  primaryChurch   Church?        @relation("PrimaryChurch", fields: [primaryChurchId], references: [id])
+  
+  memberships     Membership[]
+  attendances     Attendance[]
+  workReports     WorkReport[]
+  financeEntries  FinanceEntry[]
+  followUpTasks   FollowUpTask[] @relation("AssignedTasks")
+  createdTasks    FollowUpTask[] @relation("CreatedTasks")
+  quizAttempts    QuizAttempt[]
+  badges          UserBadge[]
+  threads         ConversationThread[]
+  messages        Message[]
+  directMessages  DirectMessage[]
+  sentReports     MessageReport[] @relation("Reporter")
+  auditLogs       AuditLog[]
+}
+
+// Diocese & Church Hierarchy
+model Diocese {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  churches    Church[]
+  senatus     Senatus[]
+}
+
+model Church {
+  id          String   @id @default(uuid())
+  name        String
+  district    String
+  sector      String?
+  address     String?
+  contactPhone String?
+  contactEmail String?
+  logoUrl     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  dioceseId   String
+  diocese     Diocese  @relation(fields: [dioceseId], references: [id])
+  
+  groups      Group[]
+  events      Event[]
+  announcements Announcement[]
+  primaryUsers User[]  @relation("PrimaryChurch")
+}
+
+// Legion of Mary Hierarchy
+model Senatus {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  dioceseId   String
+  diocese     Diocese  @relation(fields: [dioceseId], references: [id])
+  
+  regios      Regio[]
+}
+
+model Regio {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  senatusId   String?
+  senatus     Senatus? @relation(fields: [senatusId], references: [id])
+  
+  comitiums   Comitium[]
+}
+
+model Comitium {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  regioId     String
+  regio       Regio    @relation(fields: [regioId], references: [id])
+  
+  curias      Curia[]
+}
+
+model Curia {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  comitiumId  String
+  comitium    Comitium @relation(fields: [comitiumId], references: [id])
+  
+  praesidia   Praesidium[]
+}
+
+model Praesidium {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  curiaId     String
+  curia       Curia    @relation(fields: [curiaId], references: [id])
+  
+  groupId     String   @unique
+  group       Group    @relation(fields: [groupId], references: [id])
+}
+
+// Groups (All Catholic Communities)
+enum GroupType {
+  LEGION_PRAESIDIUM
+  CHARISMATIC
+  CATHOLIC_ACTION
+  YOUTH_GROUP
+  CHOIR
+  SCC
+  OTHER
+}
+
+model Group {
+  id          String    @id @default(uuid())
+  name        String
+  type        GroupType
+  description String?
+  meetingDay  String?
+  meetingTime String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  churchId    String
+  church      Church    @relation(fields: [churchId], references: [id])
+  
+  praesidium  Praesidium?
+  memberships Membership[]
+  meetings    Meeting[]
+  threads     ConversationThread[]
+  events      Event[]
+}
+
+// Membership
+enum MembershipStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
+  AUXILIARY
+}
+
+enum MembershipRole {
+  MEMBER
+  LEADER
+  SECRETARY
+  TREASURER
+  SPIRITUAL_DIRECTOR
+}
+
+model Membership {
+  id          String           @id @default(uuid())
+  status      MembershipStatus @default(PENDING)
+  role        MembershipRole   @default(MEMBER)
+  joinedAt    DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  
+  userId      String
+  user        User             @relation(fields: [userId], references: [id])
+  groupId     String
+  group       Group            @relation(fields: [groupId], references: [id])
+  
+  @@unique([userId, groupId])
+}
+
+// Meetings & Attendance
+model Meeting {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  scheduledAt DateTime
+  location    String?
+  qrCode      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  groupId     String
+  group       Group    @relation(fields: [groupId], references: [id])
+  
+  attendances Attendance[]
+  minutes     MeetingMinutes?
+}
+
+model Attendance {
+  id          String   @id @default(uuid())
+  checkedInAt DateTime @default(now())
+  method      String   @default("MANUAL") // QR or MANUAL
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  meetingId   String
+  meeting     Meeting  @relation(fields: [meetingId], references: [id])
+  
+  @@unique([userId, meetingId])
+}
+
+model MeetingMinutes {
+  id          String   @id @default(uuid())
+  content_en  String
+  content_rw  String?
+  content_fr  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  meetingId   String   @unique
+  meeting     Meeting  @relation(fields: [meetingId], references: [id])
+}
+
+// Legion Bookwork
+model WorkReport {
+  id          String   @id @default(uuid())
+  title       String
+  summary_en  String
+  summary_rw  String?
+  summary_fr  String?
+  reportDate  DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model FinanceEntry {
+  id          String   @id @default(uuid())
+  type        String   // CONTRIBUTION or EXPENSE
+  amount      Float
+  description String
+  date        DateTime
+  createdAt   DateTime @default(now())
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model FollowUpTask {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  dueDate     DateTime?
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  assignedToId String
+  assignedTo   User    @relation("AssignedTasks", fields: [assignedToId], references: [id])
+  createdById  String
+  createdBy    User    @relation("CreatedTasks", fields: [createdById], references: [id])
+}
+
+// Events & Announcements
+enum PublishStatus {
+  DRAFT
+  PUBLISHED
+  HIDDEN
+}
+
+model Event {
+  id          String        @id @default(uuid())
+  title_en    String
+  title_rw    String?
+  title_fr    String?
+  description_en String?
+  description_rw String?
+  description_fr String?
+  startDateTime DateTime
+  endDateTime   DateTime
+  location    String?
+  status      PublishStatus @default(DRAFT)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  churchId    String?
+  church      Church?       @relation(fields: [churchId], references: [id])
+  groupId     String?
+  group       Group?        @relation(fields: [groupId], references: [id])
+}
+
+model Announcement {
+  id          String        @id @default(uuid())
+  title_en    String
+  title_rw    String?
+  title_fr    String?
+  body_en     String
+  body_rw     String?
+  body_fr     String?
+  status      PublishStatus @default(DRAFT)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  churchId    String
+  church      Church        @relation(fields: [churchId], references: [id])
+}
+
+// Formation
+enum FormationLevel {
+  BEGINNER
+  GROWING
+  SERVING
+  LEADERSHIP
+}
+
+model FormationLesson {
+  id          String         @id @default(uuid())
+  title_en    String
+  title_rw    String?
+  title_fr    String?
+  content_en  String
+  content_rw  String?
+  content_fr  String?
+  level       FormationLevel @default(BEGINNER)
+  orderIndex  Int
+  durationMin Int            @default(5)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  
+  quizzes     Quiz[]
+}
+
+model Quiz {
+  id          String   @id @default(uuid())
+  question_en String
+  question_rw String?
+  question_fr String?
+  options     Json     // Array of multilingual options
+  correctIndex Int
+  explanation_en String?
+  explanation_rw String?
+  explanation_fr String?
+  
+  lessonId    String
+  lesson      FormationLesson @relation(fields: [lessonId], references: [id])
+  
+  attempts    QuizAttempt[]
+}
+
+model QuizAttempt {
+  id          String   @id @default(uuid())
+  selectedIndex Int
+  correct     Boolean
+  attemptedAt DateTime @default(now())
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  quizId      String
+  quiz        Quiz     @relation(fields: [quizId], references: [id])
+}
+
+// Devotions
+enum DevotionSourceType {
+  AUTO_CATHOLIC
+  MANUAL
+}
+
+model Devotion {
+  id          String             @id @default(uuid())
+  date        DateTime           @unique
+  liturgicalTitle String?
+  season      String?
+  rank        String?
+  bibleReferences Json
+  title_en    String
+  title_rw    String
+  title_fr    String
+  message_en  String
+  message_rw  String
+  message_fr  String
+  prayer_en   String
+  prayer_rw   String
+  prayer_fr   String
+  reflection_en String
+  reflection_rw String
+  reflection_fr String
+  action_en   String
+  action_rw   String
+  action_fr   String
+  sourceType  DevotionSourceType @default(MANUAL)
+  status      PublishStatus      @default(DRAFT)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+// Gamification
+model Badge {
+  id          String   @id @default(uuid())
+  name_en     String
+  name_rw     String?
+  name_fr     String?
+  description_en String
+  description_rw String?
+  description_fr String?
+  iconUrl     String?
+  criteria    Json     // Conditions to earn
+  createdAt   DateTime @default(now())
+  
+  userBadges  UserBadge[]
+}
+
+model UserBadge {
+  id          String   @id @default(uuid())
+  earnedAt    DateTime @default(now())
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  badgeId     String
+  badge       Badge    @relation(fields: [badgeId], references: [id])
+  
+  @@unique([userId, badgeId])
+}
+
+// Structured Communication
+enum ThreadCategory {
+  PRAYER_REQUEST
+  MEETING_DISCUSSION
+  FORMATION_QUESTION
+  SERVICE_PLANNING
+  ENCOURAGEMENT
+}
+
+model ConversationThread {
+  id          String         @id @default(uuid())
+  title       String
+  category    ThreadCategory
+  pinned      Boolean        @default(false)
+  locked      Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  
+  groupId     String
+  group       Group          @relation(fields: [groupId], references: [id])
+  createdById String
+  createdBy   User           @relation(fields: [createdById], references: [id])
+  
+  messages    Message[]
+}
+
+enum ReactionType {
+  AMEN
+  PRAYING
+  THANK_YOU
+  WELL_DONE
+}
+
+model Message {
+  id          String   @id @default(uuid())
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  threadId    String
+  thread      ConversationThread @relation(fields: [threadId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  reactions   Json?    // {AMEN: 5, PRAYING: 3}
+}
+
+model DirectMessage {
+  id          String   @id @default(uuid())
+  content     String
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  
+  senderId    String
+  sender      User     @relation(fields: [senderId], references: [id])
+  receiverId  String
+  
+  @@index([senderId, receiverId])
+}
+
+model MessageReport {
+  id          String   @id @default(uuid())
+  reason      String
+  description String?
+  status      String   @default("PENDING") // PENDING, REVIEWED, RESOLVED
+  createdAt   DateTime @default(now())
+  
+  reporterId  String
+  reporter    User     @relation("Reporter", fields: [reporterId], references: [id])
+  targetType  String   // MESSAGE or DIRECT_MESSAGE
+  targetId    String
+}
+
+// Audit Log
+model AuditLog {
+  id          String   @id @default(uuid())
+  action      String
+  targetType  String?
+  targetId    String?
+  details     Json?
+  createdAt   DateTime @default(now())
+  
+  performedById String?
+  performedBy   User?   @relation(fields: [performedById], references: [id])
+}
