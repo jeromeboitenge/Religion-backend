@@ -10,17 +10,16 @@ export class AnnouncementsService {
     const where: any = {};
     
     if (churchId) where.churchId = churchId;
-    if (groupId) where.groupId = groupId;
 
     return this.prisma.announcement.findMany({
       where,
       include: {
         church: { select: { name: true } },
-        createdByUser: {
+        user: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            displayName: true,
+            email: true,
           },
         },
       },
@@ -33,11 +32,11 @@ export class AnnouncementsService {
       where: { id },
       include: {
         church: true,
-        createdByUser: {
+        user: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            displayName: true,
+            email: true,
           },
         },
       },
@@ -51,12 +50,8 @@ export class AnnouncementsService {
     return this.prisma.announcement.create({
       data: {
         churchId: dto.churchId,
-        title_en: dto.title_en,
-        title_rw: dto.title_rw,
-        title_fr: dto.title_fr,
-        content_en: dto.content_en,
-        content_rw: dto.content_rw,
-        content_fr: dto.content_fr,
+        title: dto.title_en,
+        content: dto.content_en,
         priority: dto.priority,
         userId,
       },

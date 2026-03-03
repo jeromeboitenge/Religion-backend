@@ -6,34 +6,33 @@ export class CreateAnnouncementDto {
   @IsString()
   churchId: string;
 
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString()
-  groupId?: string;
-
   @ApiProperty()
   @IsString()
   title_en: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
-  title_rw: string;
+  title_rw?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
-  title_fr: string;
+  title_fr?: string;
 
   @ApiProperty()
   @IsString()
   content_en: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
-  content_rw: string;
+  content_rw?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
-  content_fr: string;
+  content_fr?: string;
 
   @ApiProperty({ enum: ['INFO', 'URGENT', 'EVENT', 'REMINDER'] })
   @IsEnum(['INFO', 'URGENT', 'EVENT', 'REMINDER'])
