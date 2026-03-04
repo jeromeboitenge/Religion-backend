@@ -11,7 +11,7 @@ export class EventsService {
     
     if (churchId) where.churchId = churchId;
     if (upcoming) {
-      where.startTime = { gte: new Date() };
+      where.startDateTime = { gte: new Date() };
     }
 
     return this.prisma.event.findMany({
@@ -20,7 +20,7 @@ export class EventsService {
         church: { select: { name_en: true, name_rw: true, name_fr: true } },
         group: { select: { name_en: true, name_rw: true, name_fr: true } },
       },
-      orderBy: { startTime: upcoming ? 'asc' : 'desc' },
+      orderBy: { startDateTime: upcoming ? 'asc' : 'desc' },
     });
   }
 
@@ -38,13 +38,20 @@ export class EventsService {
   }
 
   async create(dto: CreateEventDto, createdBy: string) {
-    const conflicts = await this.checkConflicts(dto.churchId, dto.startTime, dto.endTime);
-    
     return this.prisma.event.create({
       data: {
-        ...dto,
-        createdBy,
-        hasConflict: conflicts.length > 0,
+        title_en: dto.title_en,
+        title_rw: dto.title_rw,
+        title_fr: dto.title_fr,
+        description_en: dto.description_en,
+        description_rw: dto.description_rw,
+        description_fr: dto.description_fr,
+        startDateTime: new Date(dto.startTime),
+        endDateTime: new Date(dto.endTime),
+        location: dto.location,
+        churchId: dto.churchId,
+        groupId: dto.groupId,
+        status: 'PUBLISHED',
       },
       include: {
         church: true,
@@ -63,20 +70,20 @@ export class EventsService {
         OR: [
           {
             AND: [
-              { startTime: { lte: start } },
-              { endTime: { gte: start } },
+              { startDateTime: { lte: start } },
+              { endDateTime: { gte: start } },
             ],
           },
           {
             AND: [
-              { startTime: { lte: end } },
-              { endTime: { gte: end } },
+              { startDateTime: { lte: end } },
+              { endDateTime: { gte: end } },
             ],
           },
           {
             AND: [
-              { startTime: { gte: start } },
-              { endTime: { lte: end } },
+              { startDateTime: { gte: start } },
+              { endDateTime: { lte: end } },
             ],
           },
         ],

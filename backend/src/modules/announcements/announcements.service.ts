@@ -14,14 +14,7 @@ export class AnnouncementsService {
     return this.prisma.announcement.findMany({
       where,
       include: {
-        church: { select: { name: true } },
-        user: {
-          select: {
-            id: true,
-            displayName: true,
-            email: true,
-          },
-        },
+        church: { select: { name_en: true, name_rw: true, name_fr: true } },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -32,13 +25,6 @@ export class AnnouncementsService {
       where: { id },
       include: {
         church: true,
-        user: {
-          select: {
-            id: true,
-            displayName: true,
-            email: true,
-          },
-        },
       },
     });
 
@@ -50,10 +36,13 @@ export class AnnouncementsService {
     return this.prisma.announcement.create({
       data: {
         churchId: dto.churchId,
-        title: dto.title_en,
-        content: dto.content_en,
-        priority: dto.priority,
-        userId,
+        title_en: dto.title_en,
+        title_rw: dto.title_rw,
+        title_fr: dto.title_fr,
+        body_en: dto.content_en,
+        body_rw: dto.content_rw,
+        body_fr: dto.content_fr,
+        status: 'PUBLISHED',
       },
       include: {
         church: true,

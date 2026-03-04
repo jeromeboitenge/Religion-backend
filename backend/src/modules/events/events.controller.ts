@@ -29,7 +29,7 @@ export class EventsController {
   @UseGuards(RolesGuard)
   @Roles('GROUP_LEADER', 'PARISH_ADMIN', 'SUPER_ADMIN')
   @ApiOperation({ summary: 'Create event' })
-  create(@Body() dto: CreateEventDto, @Request() req) {
+  create(@Body() dto: CreateEventDto, @Request() req: any) {
     return this.eventsService.create(dto, req.user.userId);
   }
 
