@@ -10,7 +10,13 @@ async function main() {
   const diocese = await prisma.diocese.create({
     data: {
       name: 'Diocese of Kigali',
+      name_en: 'Diocese of Kigali',
+      name_rw: 'Diyoseze ya Kigali',
+      name_fr: 'Diocèse de Kigali',
       description: 'Catholic Diocese of Kigali, Rwanda',
+      description_en: 'Catholic Diocese of Kigali, Rwanda',
+      description_rw: 'Diyoseze Gatolika ya Kigali, u Rwanda',
+      description_fr: 'Diocèse Catholique de Kigali, Rwanda',
     },
   });
 
@@ -19,9 +25,15 @@ async function main() {
     prisma.church.create({
       data: {
         name: 'St. Michael Parish',
+        name_en: 'St. Michael Parish',
+        name_rw: 'Paruwasi ya Mutagatifu Mikayeli',
+        name_fr: 'Paroisse Saint-Michel',
         district: 'Gasabo',
         sector: 'Remera',
         address: 'KG 11 Ave, Kigali',
+        address_en: 'KG 11 Ave, Kigali',
+        address_rw: 'KG 11 Ave, Kigali',
+        address_fr: 'KG 11 Ave, Kigali',
         contactPhone: '+250788123456',
         contactEmail: 'stmichael@catholic.rw',
         dioceseId: diocese.id,
@@ -30,9 +42,15 @@ async function main() {
     prisma.church.create({
       data: {
         name: 'Regina Pacis Parish',
+        name_en: 'Regina Pacis Parish',
+        name_rw: 'Paruwasi ya Regina Pacis',
+        name_fr: 'Paroisse Regina Pacis',
         district: 'Kicukiro',
         sector: 'Gikondo',
         address: 'KK 15 St, Kigali',
+        address_en: 'KK 15 St, Kigali',
+        address_rw: 'KK 15 St, Kigali',
+        address_fr: 'KK 15 St, Kigali',
         contactPhone: '+250788234567',
         contactEmail: 'reginapacis@catholic.rw',
         dioceseId: diocese.id,
@@ -41,9 +59,15 @@ async function main() {
     prisma.church.create({
       data: {
         name: 'Holy Family Parish',
+        name_en: 'Holy Family Parish',
+        name_rw: 'Paruwasi y\'Umuryango Wera',
+        name_fr: 'Paroisse de la Sainte Famille',
         district: 'Nyarugenge',
         sector: 'Nyamirambo',
         address: 'KN 5 Rd, Kigali',
+        address_en: 'KN 5 Rd, Kigali',
+        address_rw: 'KN 5 Rd, Kigali',
+        address_fr: 'KN 5 Rd, Kigali',
         contactPhone: '+250788345678',
         contactEmail: 'holyfamily@catholic.rw',
         dioceseId: diocese.id,
@@ -55,7 +79,13 @@ async function main() {
   const senatus = await prisma.senatus.create({
     data: {
       name: 'Senatus of Rwanda',
+      name_en: 'Senatus of Rwanda',
+      name_rw: 'Senatus y\'u Rwanda',
+      name_fr: 'Senatus du Rwanda',
       description: 'National Legion of Mary Council',
+      description_en: 'National Legion of Mary Council',
+      description_rw: 'Inama y\'Igihugu ya Legion ya Mariya',
+      description_fr: 'Conseil National de la Légion de Marie',
       dioceseId: diocese.id,
     },
   });
@@ -63,7 +93,13 @@ async function main() {
   const regio = await prisma.regio.create({
     data: {
       name: 'Regio of Kigali',
+      name_en: 'Regio of Kigali',
+      name_rw: 'Regio ya Kigali',
+      name_fr: 'Regio de Kigali',
       description: 'Kigali Regional Council',
+      description_en: 'Kigali Regional Council',
+      description_rw: 'Inama y\'Akarere ka Kigali',
+      description_fr: 'Conseil Régional de Kigali',
       senatusId: senatus.id,
     },
   });
@@ -72,12 +108,18 @@ async function main() {
     prisma.comitium.create({
       data: {
         name: 'Comitium of Gasabo',
+        name_en: 'Comitium of Gasabo',
+        name_rw: 'Comitium ya Gasabo',
+        name_fr: 'Comitium de Gasabo',
         regioId: regio.id,
       },
     }),
     prisma.comitium.create({
       data: {
         name: 'Comitium of Kicukiro',
+        name_en: 'Comitium of Kicukiro',
+        name_rw: 'Comitium ya Kicukiro',
+        name_fr: 'Comitium de Kicukiro',
         regioId: regio.id,
       },
     }),
@@ -87,18 +129,27 @@ async function main() {
     prisma.curia.create({
       data: {
         name: 'Curia of Remera',
+        name_en: 'Curia of Remera',
+        name_rw: 'Curia ya Remera',
+        name_fr: 'Curie de Remera',
         comitiumId: comitiums[0].id,
       },
     }),
     prisma.curia.create({
       data: {
         name: 'Curia of Kimironko',
+        name_en: 'Curia of Kimironko',
+        name_rw: 'Curia ya Kimironko',
+        name_fr: 'Curie de Kimironko',
         comitiumId: comitiums[0].id,
       },
     }),
     prisma.curia.create({
       data: {
         name: 'Curia of Gikondo',
+        name_en: 'Curia of Gikondo',
+        name_rw: 'Curia ya Gikondo',
+        name_fr: 'Curie de Gikondo',
         comitiumId: comitiums[1].id,
       },
     }),
@@ -112,8 +163,14 @@ async function main() {
     const group = await prisma.group.create({
       data: {
         name: `Praesidium of Our Lady ${i + 1}`,
+        name_en: `Praesidium of Our Lady ${i + 1}`,
+        name_rw: `Praesidium ya Bikira Mariya ${i + 1}`,
+        name_fr: `Praesidium de Notre-Dame ${i + 1}`,
         type: 'LEGION_PRAESIDIUM',
         description: 'Active Legion of Mary Praesidium',
+        description_en: 'Active Legion of Mary Praesidium',
+        description_rw: 'Praesidium ikora ya Legion ya Mariya',
+        description_fr: 'Praesidium actif de la Légion de Marie',
         meetingDay: 'Sunday',
         meetingTime: '14:00',
         churchId: parishes[0].id,
@@ -123,6 +180,9 @@ async function main() {
     await prisma.praesidium.create({
       data: {
         name: group.name,
+        name_en: group.name_en,
+        name_rw: group.name_rw,
+        name_fr: group.name_fr,
         groupId: group.id,
         curiaId: curias[i % 2].id,
       },
@@ -136,8 +196,14 @@ async function main() {
     await prisma.group.create({
       data: {
         name: 'Catholic Charismatic Renewal',
+        name_en: 'Catholic Charismatic Renewal',
+        name_rw: 'Ivugurura rya Karismatike Gatolika',
+        name_fr: 'Renouveau Charismatique Catholique',
         type: 'CHARISMATIC',
         description: 'Youth Charismatic Prayer Group',
+        description_en: 'Youth Charismatic Prayer Group',
+        description_rw: 'Itsinda ry\'Urubyiruko ryo Gusenga Karismatike',
+        description_fr: 'Groupe de Prière Charismatique des Jeunes',
         meetingDay: 'Friday',
         meetingTime: '18:00',
         churchId: parishes[0].id,
@@ -146,8 +212,14 @@ async function main() {
     await prisma.group.create({
       data: {
         name: 'St. Michael Youth Choir',
+        name_en: 'St. Michael Youth Choir',
+        name_rw: 'Kwaya y\'Urubyiruko ya Mutagatifu Mikayeli',
+        name_fr: 'Chorale des Jeunes Saint-Michel',
         type: 'CHOIR',
         description: 'Parish Youth Choir',
+        description_en: 'Parish Youth Choir',
+        description_rw: 'Kwaya y\'Urubyiruko ya Paruwasi',
+        description_fr: 'Chorale des Jeunes de la Paroisse',
         meetingDay: 'Saturday',
         meetingTime: '15:00',
         churchId: parishes[0].id,
@@ -156,8 +228,14 @@ async function main() {
     await prisma.group.create({
       data: {
         name: 'Catholic Action Youth',
+        name_en: 'Catholic Action Youth',
+        name_rw: 'Urubyiruko rw\'Igikorwa Gatolika',
+        name_fr: 'Action Catholique des Jeunes',
         type: 'CATHOLIC_ACTION',
         description: 'Catholic Action for Youth',
+        description_en: 'Catholic Action for Youth',
+        description_rw: 'Igikorwa Gatolika ku Rubyiruko',
+        description_fr: 'Action Catholique pour les Jeunes',
         meetingDay: 'Wednesday',
         meetingTime: '17:00',
         churchId: parishes[1].id,
